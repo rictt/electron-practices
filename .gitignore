@@ -1,0 +1,7 @@
+node_modules
+dist
+out
+*.log*
+
+electron.vite.config.*.mjs
+electron.vite.config.js

@@ -1,0 +1,25 @@
+{
+  "extends": "@electron-toolkit/tsconfig/tsconfig.web.json",
+  "include": [
+    "src/renderer/src/env.d.ts",
+    "src/renderer/src/views/**/*.vue",
+    "src/renderer/src/**/**/*.ts",
+    "src/renderer/src/**/**/*.vue",
+    "src/renderer/src/**/*.vue",
+    "src/preload/*.d.ts"
+  ],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "strict": false,
+    "noUnusedParameters": false,
+    "noUnusedLocals": false,
+    "paths": {
+      "@renderer/*": [
+        "./src/renderer/src/*"
+      ],
+      "@renderer/ipc/*": [
+        "src/renderer/src/ipc/*"
+      ],
+    }
+  }
+}

@@ -88,20 +88,23 @@ export function mouseEventWrap(params: Params) {
 
 export function useMovePosition(params: Params) {
   const { ele, log = true } = params
-  const state = reactive({
-    downed: false,
-    sx: 0,
-    sy: 0,
-    mx: 0,
-    my: 0,
-    dx: 0,
-    dy: 0,
-    width: 0,
-    height: 0,
-    // 区别于sx，sy，left top做过矫正后
-    left: 0,
-    top: 0
-  })
+  const createDefault = () => {
+    return {
+      downed: false,
+      sx: 0,
+      sy: 0,
+      mx: 0,
+      my: 0,
+      dx: 0,
+      dy: 0,
+      width: 0,
+      height: 0,
+      // 区别于sx，sy，left top做过矫正后
+      left: 0,
+      top: 0
+    }
+  }
+  const state = reactive(createDefault())
   
   const printLog = (msg: any) => {
     if (log) {
@@ -144,5 +147,11 @@ export function useMovePosition(params: Params) {
 
   return {
     state,
+    reset: () => {
+      const newData = createDefault()
+      Object.keys(newData).forEach(key => {
+        state[key] = newData[key]
+      })
+    }
   }
 }

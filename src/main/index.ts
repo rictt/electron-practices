@@ -38,12 +38,13 @@ function createWindow(): void {
   }
 }
 
-let captureWindow: BrowserWindow | null;
+export let captureWindow: BrowserWindow | null;
 export function createCaptureWindow() {
   captureWindow = new BrowserWindow({
     transparent: true,
     frame: false,
     alwaysOnTop: true,
+    show: false,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
@@ -55,8 +56,17 @@ export function createCaptureWindow() {
     captureWindow?.webContents?.openDevTools();
   })
 
-  globalShortcut.register('esc', () => {
-    captureWindow?.webContents?.close();
+  captureWindow.on('show', () => {
+    globalShortcut.register('esc', () => {
+      captureWindow?.hide()
+    })
+  })
+  captureWindow.on('hide', () => {
+    globalShortcut.unregister('esc')
+  })
+
+  globalShortcut.register('f2', () => {
+    captureWindow?.show()
   })
 
   if (!app.isPackaged && process.env['ELECTRON_RENDERER_URL']) {
@@ -66,11 +76,10 @@ export function createCaptureWindow() {
   }
 
   captureWindow.once('ready-to-show', () => {
-    captureWindow?.show()
   });
 
   captureWindow.on('close', () => {
-    captureWindow = null;
+    // captureWindow = null;
   })
 }
 
@@ -84,7 +93,9 @@ app.whenReady().then(() => {
 
   createWindow()
 
-  // createCaptureWindow();
+  setTimeout(() => {
+    createCaptureWindow();
+  }, 1000)
 
   registerMainHanlders(mainWindow);
 

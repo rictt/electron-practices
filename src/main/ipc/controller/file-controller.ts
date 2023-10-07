@@ -19,7 +19,7 @@ export type FILE_STAT = {
 
 // 不同系统下的用户个人文件夹位置不同，通过osenv来抹平差距
 // https://www.cnblogs.com/tugenhua0707/p/11080473.html
-function getUsersHomeFolder() {
+export function getUsersHomeFolder() {
   return osenv.home()
 }
 

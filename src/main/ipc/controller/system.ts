@@ -1,7 +1,7 @@
 import { IpcMainBaseController } from './base'
 import type { IpcMainEvent } from 'electron'
-import { BrowserWindow, screen } from 'electron';
-import { createCaptureWindow } from '../../index'
+import { BrowserWindow, screen } from 'electron'
+import { createCaptureWindow, captureWindow } from '../../index'
 
 export class SystemController extends IpcMainBaseController {
   constructor() {
@@ -9,12 +9,22 @@ export class SystemController extends IpcMainBaseController {
   }
 
   async closeWindow(event: IpcMainEvent) {
-    return event.sender.close();
+    return event.sender.close()
+  }
+
+  async hideWindow(event: IpcMainEvent) {
+    const window = BrowserWindow.fromWebContents(event.sender)
+    window?.hide()
+  }
+
+  async showWindow(event: IpcMainEvent) {
+    const window = BrowserWindow.fromWebContents(event.sender)
+    window?.show()
   }
 
   async showCapture(event: IpcMainEvent) {
     this.windowMinimize(event)
-    createCaptureWindow()
+    captureWindow?.show()
   }
 
   async windowMinimize(event: IpcMainEvent) {
@@ -37,8 +47,6 @@ export class SystemController extends IpcMainBaseController {
     direction = direction || 'right-bottom'
     const window = BrowserWindow.fromWebContents(event.sender)
     if (window) {
-      window.setMaximumSize(width, height)
-      window.setMinimumSize(width, height)
       window.setSize(width, height)
       const areaInfo = screen.getPrimaryDisplay().workAreaSize
       if (direction === 'right-bottom') {
@@ -49,10 +57,27 @@ export class SystemController extends IpcMainBaseController {
     }
   }
 
-  async setSize(event: IpcMainEvent, width: number, height: number) {
+  async setSize(
+    event: IpcMainEvent,
+    width: number,
+    height: number,
+    full?: boolean,
+    x?: number,
+    y?: number
+  ) {
     const window = BrowserWindow.fromWebContents(event.sender)
+    console.log(width, height, full, x, y)
+    if (typeof x === 'number' && typeof y === 'number') {
+      window?.setPosition(x, y)
+    }
     if (window) {
-      window.setSize(width, height)
+      if (full) {
+        window.maximize()
+        window.setFullScreen(true)
+        window.setAlwaysOnTop(true, "screen-saver")
+      } else {
+        window.setSize(width, height)
+      }
     }
   }
 }

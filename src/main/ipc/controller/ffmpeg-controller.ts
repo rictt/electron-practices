@@ -1,11 +1,21 @@
 import { IpcMainBaseController } from './base'
 import type { IpcMainEvent, IpcMainInvokeEvent } from 'electron'
 import ffmpeg from 'fluent-ffmpeg'
-import { desktopCapturer, ipcMain } from 'electron'
+import { desktopCapturer, dialog, ipcMain } from 'electron'
+import * as path from 'path'
+import { getUsersHomeFolder } from './file-controller'
 
 type MetaData = {
   streams: any
   format: any
+}
+
+export const generateFileName = () => {
+  // return 'F:\\test.mp4'
+  const baseDir = getUsersHomeFolder()
+  const filePath = path.join(baseDir, 'test_' + Date.now() + '.mp4')
+  console.log(filePath)
+  return filePath
 }
 
 export const getMetadata = (fileName: string): Promise<MetaData> => {
@@ -65,49 +75,45 @@ export class FFMpegController extends IpcMainBaseController {
   async getCapturerSources(event: IpcMainEvent) {
     const sources = await desktopCapturer.getSources({ types: ['window', 'screen'] })
     return sources || []
-    // console.log(sources)
-    // for (const source of sources) {
-    //   if (source.name === 'Electron') {
-    //     return source.id
-    //   }
-    // }
-    // return null
   }
 
+
+  /**
+   * https://zhuanlan.zhihu.com/p/580624916
+   * https://blog.csdn.net/longji/article/details/124187706
+   */
   async screenRecord(event: IpcMainEvent, params: any) {
     // 需要提供结束方法
-    console.log('start screen record')
     console.log('start screen record params： ', params)
     const { x, y, width, height } = params
     const inputOptions: any[] = []
-    inputOptions.push('-f dshow')
-    // if (x && y) {
-    //   inputOptions.push(
-    //     `offset_x ${x}`,
-    //     `offset_y ${y}`
-    //   )
-    // }
+    
+    // inputOptions.push('-f dshow')
+    inputOptions.push('-f gdigrab')
     if (width && height) {
       inputOptions.push(
-        // `-s ${width}x${height}`
-        `-s ${1920}x${1080}`
+        `-s ${Math.floor(width / 2) * 2}x${Math.floor(height / 2) * 2}`
       )
+    }
+    if (x && y) {
+      inputOptions.push(`-offset_x ${x}`)
+      inputOptions.push(`-offset_y ${y}`)
     }
     console.log("inputOptions: ", inputOptions)
     const cmd = new ffmpeg()
     cmd
-      .input('video=screen-capture-recorder')
+      // .input('video=screen-capture-recorder')
+      .input('desktop')
       .inputOptions(inputOptions)
-      .videoCodec('libx264')
+      // .videoCodec('libx264')
       // 如果是可以保证正常录制结束，可以保证MP4不会损坏
       // 如果是异常中断，MP4可能会损坏播放不了，这种情况考虑flv格式
-      .output('F:\\test.mp4')
+      .output(generateFileName())
       .outputOptions(['-pix_fmt yuv420p'])
       .on('progress', function (progress) {
         console.log('time: ' + progress.timemark)
       })
       .on('error', function (err) {
-        //ffmpeg出错时的回调
         console.log('An error occurred: ' + err.message)
       })
       .on('end', function () {
@@ -118,7 +124,7 @@ export class FFMpegController extends IpcMainBaseController {
 
     if (params.closeChannel) {
       ipcMain.handle(params.closeChannel, (event: IpcMainInvokeEvent) => {
-        cmd.ffmpegProc.stdin.write('q\n')
+        cmd.ffmpegProc?.stdin?.write('q\n')
         return true
       })
     }

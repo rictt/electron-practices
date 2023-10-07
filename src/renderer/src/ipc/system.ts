@@ -8,8 +8,16 @@ export class SystemIpcRendererService extends IpcRendererService {
     return await this.invoke('closeWindow')
   }
 
-  async setSize(width, height) {
-    return await this.invoke('setSize', width, height)
+  async showWindow() {
+    return await this.invoke('showWindow')
+  }
+
+  async hideWindow() {
+    return await this.invoke('hideWindow')
+  }
+
+  async setSize(width, height, full?,  x?, y?) {
+    return await this.invoke('setSize', width, height, full, x, y)
   }
 
   async setMini(width, height, direction?) {
@@ -18,6 +26,10 @@ export class SystemIpcRendererService extends IpcRendererService {
 
   async showCapture() {
     return this.invoke('showCapture')
+  }
+
+  async getScreenSize() {
+    return this.invoke('getScreenSize')
   }
   
 }

@@ -11,7 +11,7 @@ const state = reactive({
 })
 
 const onClickStart = async () => {
-  alert(`${data.width}, ${data.height}, ${data.left}, ${data.top}`)
+  // alert(`${data.width}, ${data.height}, ${data.left}, ${data.top}`)
   state.visible = false
   setTimeout(async () => {
     const recordInstance = await ffmpegIpcRendererService.screenRecord({
@@ -28,23 +28,36 @@ const onClickStart = async () => {
 }
 
 const onClickCancel = async () => {
+  resetData()
+  state.visible = true
   state.recordInstance?.close?.()
-  await systemIpcRendererService.closeWindow()
+  const size = await systemIpcRendererService.getScreenSize()
+  console.log("size: ", size)
+  await systemIpcRendererService.setSize(size.width, size.height, true, 0, 0)
+  await systemIpcRendererService.hideWindow()
 }
 
 const onFinishRecord = async () => {
+  resetData()
+  state.visible = true
   await state.recordInstance?.close()
-  await systemIpcRendererService.closeWindow()
+  const size = await systemIpcRendererService.getScreenSize()
+  await systemIpcRendererService.setSize(size.width, size.height, true, 0, 0)
+  await systemIpcRendererService.hideWindow()
 }
 
-const { state: data } = useMovePosition({
+document.addEventListener('visibilitychange', () => {
+  resetData()
+})
+
+const { state: data, reset: resetData } = useMovePosition({
   ele: document.querySelector('body')!,
   log: false
 })
 
 const boxStyle = computed(() => {
   return {
-    visibility: data.width || data.height ? 'visible' : 'hidden',
+    display: data.width || data.height ? 'block' : 'none',
     left: data.left + 'px',
     top: data.top + 'px',
     width: data.width + 'px',
@@ -54,7 +67,7 @@ const boxStyle = computed(() => {
 
 const menuStyle = computed(() => {
   return {
-    visibility: data.width || data.height ? 'visible' : 'hidden',
+    display: data.width || data.height ? 'block' : 'none',
     left: data.left + 'px',
     top: data.top + data.height + 20 + 'px',
   }
@@ -201,7 +214,6 @@ onMounted(() => {
   border: 1px solid red;
   border-radius: 2px;
   color: #fff;
-  visibility: hidden;
   user-select: none;
 
   .cursor-move-box {
@@ -285,7 +297,6 @@ onMounted(() => {
 }
 .capture-menu {
   position: fixed;
-  visibility: hidden;
   padding: 8px 10px;
   background-color: #444444;
   user-select: none;

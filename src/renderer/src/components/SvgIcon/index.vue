@@ -35,6 +35,7 @@ const svgClass = computed(() => {
 
 <style scoped>
 .svg-icon {
+  display: inline-block;
   width: 1em;
   height: 1em;
   position: relative;

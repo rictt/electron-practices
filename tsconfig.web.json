@@ -14,6 +14,9 @@
     "noUnusedParameters": false,
     "noUnusedLocals": false,
     "paths": {
+      "@/*": [
+        "./src/renderer/src/*"
+      ],
       "@renderer/*": [
         "./src/renderer/src/*"
       ],

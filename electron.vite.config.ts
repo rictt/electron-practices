@@ -3,6 +3,8 @@ import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
 import vue from '@vitejs/plugin-vue'
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 import vueJSX from '@vitejs/plugin-vue-jsx'
+import tailwindcss from 'tailwindcss'
+import autoprefixer from 'autoprefixer'
 
 export default defineConfig({
   main: {
@@ -14,27 +16,33 @@ export default defineConfig({
       rollupOptions: {
         input: {
           index: resolve(__dirname, 'src/preload/index.ts'),
-          capture: resolve(__dirname, 'src/preload/index.ts'),
+          capture: resolve(__dirname, 'src/preload/index.ts')
         }
       }
-    },
+    }
   },
   renderer: {
+    css: {
+      postcss: {
+        plugins: [tailwindcss, autoprefixer]
+      }
+    },
     build: {
       rollupOptions: {
         input: {
           index: resolve(__dirname, 'src/renderer/index.html'),
-          capture: resolve(__dirname, 'src/renderer/capture.html'),
+          capture: resolve(__dirname, 'src/renderer/capture.html')
         },
         output: {
-          dir: "./out/renderer",
+          dir: './out/renderer'
         }
       }
     },
     resolve: {
       alias: {
         '@renderer': resolve('src/renderer/src/'),
-        '@ipc': resolve('src/ipc')
+        '@ipc': resolve('src/ipc'),
+        '@': resolve('src/renderer/src/')
       }
     },
     plugins: [
@@ -43,7 +51,7 @@ export default defineConfig({
       createSvgIconsPlugin({
         iconDirs: [resolve(process.cwd(), 'src/renderer/src/assets/svg')],
         symbolId: 'icon-[dir]-[name]'
-      }),
+      })
     ]
   }
 })

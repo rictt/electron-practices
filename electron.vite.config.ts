@@ -41,7 +41,6 @@ export default defineConfig({
     resolve: {
       alias: {
         '@renderer': resolve('src/renderer/src/'),
-        '@ipc': resolve('src/ipc'),
         '@': resolve('src/renderer/src/')
       }
     },

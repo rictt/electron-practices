@@ -2,6 +2,7 @@
 import { reactive } from 'vue'
 import SvgPreview from '../../components/SvgIcon/preview.vue'
 import Cook from '@/components/Cook/index.vue'
+import Hls from '@/components/Hls/index.vue'
 
 </script>
 
@@ -9,7 +10,8 @@ import Cook from '@/components/Cook/index.vue'
   <div>
     <SvgPreview />
     <div>
-      <Cook />
+      <!-- <Cook /> -->
+      <Hls />
     </div>
   </div>
 </template>

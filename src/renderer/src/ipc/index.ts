@@ -18,7 +18,7 @@ export class IpcRendererService {
         return `${channel}_response_${Date.now()}`
     }
 
-    async invoke(channel: string, ...params: any[]) {
+    async invoke(channel: string, ...params: any[]): any {
     // async invoke(channel: string, params?: any) {
         const fullChannel = `${this.prefix}:${channel}`
         try {

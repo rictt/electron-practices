@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, globalShortcut } from 'electron'
+import { app, shell, BrowserWindow, globalShortcut, protocol } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -20,7 +20,7 @@ function createWindow(): void {
     }
   })
 
-  // mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
@@ -30,12 +30,14 @@ function createWindow(): void {
     shell.openExternal(details.url)
     return { action: 'deny' }
   })
+
+  mainWindow.loadURL("https://www.med66.com/demo/linchuang/c724034-v1/")
   
-  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
-  } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
-  }
+  // if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+  //   mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
+  // } else {
+  //   mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+  // }
 }
 
 export let captureWindow: BrowserWindow | null;
@@ -83,9 +85,26 @@ export function createCaptureWindow() {
   })
 }
 
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: 'atom',
+    privileges: {
+      bypassCSP: true,
+      standard: true,
+      secure: true,
+      supportFetchAPI: true
+    }
+  }
+])
+
 app.whenReady().then(() => {
   electronApp.setAppUserModelId('com.electron')
-
+  
+  protocol.handle('atom', (request: any) => {
+    console.log('request: ', request.url)
+    console.log('handle: ', decodeURIComponent(request.url.slice('atom://'.length)))
+    return decodeURIComponent(request.url.slice('atom://'.length))
+  })
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })

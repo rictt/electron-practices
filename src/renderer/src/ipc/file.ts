@@ -10,15 +10,22 @@ export class FileIpcRendererService extends IpcRendererService {
     return this.invoke('getDirs', p)
   }
 
-  selectFile(params?: OpenDialogOptions) {
-    return this.invoke('selectFile', params)
+  selectFile(params?: OpenDialogOptions): string[] | undefined {
+    return this.invoke('selectFile', {
+      ...params,
+      properties : [
+        'openFile',
+        ...params?.properties || []
+      ]
+    } as OpenDialogOptions)
   }
 
   selectFolder(params?: OpenDialogOptions) {
     return this.invoke('selectFile', {
       ...params,
       properties : [
-        'openDirectory'
+        'openDirectory',
+        ...params?.properties || []
       ]
     })
   }

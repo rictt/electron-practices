@@ -14,14 +14,14 @@
     "noUnusedParameters": false,
     "noUnusedLocals": false,
     "paths": {
-      "@/*": [
-        "./src/renderer/src/*"
-      ],
       "@renderer/*": [
         "./src/renderer/src/*"
       ],
       "@renderer/ipc/*": [
         "src/renderer/src/ipc/*"
+      ],
+      "@/*": [
+        "./src/renderer/src/*"
       ],
     }
   }

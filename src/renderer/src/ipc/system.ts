@@ -1,3 +1,4 @@
+import { ElMessage } from 'element-plus'
 import { IpcRendererService } from './index'
 export class SystemIpcRendererService extends IpcRendererService {
   constructor() {
@@ -16,7 +17,7 @@ export class SystemIpcRendererService extends IpcRendererService {
     return await this.invoke('hideWindow')
   }
 
-  async setSize(width, height, full?,  x?, y?) {
+  async setSize(width, height, full?, x?, y?) {
     return await this.invoke('setSize', width, height, full, x, y)
   }
 
@@ -31,7 +32,6 @@ export class SystemIpcRendererService extends IpcRendererService {
   async getScreenSize() {
     return this.invoke('getScreenSize')
   }
-  
 }
 
 export const systemIpcRendererService = new SystemIpcRendererService()

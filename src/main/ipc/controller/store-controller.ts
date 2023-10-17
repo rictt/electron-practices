@@ -4,7 +4,6 @@ import { IpcMainBaseController } from './base'
 
 export const store = new Store()
 
-
 export class StoreController extends IpcMainBaseController {
   constructor() {
     super('store')

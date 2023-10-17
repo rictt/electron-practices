@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { systemIpcRendererService } from '@renderer/ipc/system';
+import { systemIpcRendererService } from '@renderer/ipc/system'
 
 const activeIndex = ref('0')
 const router = useRouter()
@@ -55,9 +55,10 @@ const handleSelect = (key, keyPath, item) => {
     <template v-for="(menu, index) in menuList" :key="index">
       <el-menu-item v-if="!menu.children" :index="index + ''">{{ menu.label }}</el-menu-item>
       <el-sub-menu v-else :index="index + ''">
-        <template v-slot:title>{{ menu.label }}</template>
+        <template #title>{{ menu.label }}</template>
         <el-menu-item
           v-for="(subMenu, subIndex) in menu.children"
+          :key="`${index}-${subIndex}`"
           :index="`${index}-${subIndex}`"
           >{{ subMenu.label }}</el-menu-item
         >

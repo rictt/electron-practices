@@ -30,7 +30,7 @@ export class FFMpegIpcRendererService extends IpcRendererService {
     const progressChannel = this.generateResponseChannel('progress')
     const finishedChannel = this.generateResponseChannel('finished')
     const { onProgress, onFinished } = formatParams
-    
+
     if (onProgress) {
       this.ipcRenderer.on(progressChannel, (event: IpcRendererEvent, args: any) => {
         onProgress(args)
@@ -49,7 +49,7 @@ export class FFMpegIpcRendererService extends IpcRendererService {
       ...formatParams,
       processReplyChannel: progressChannel,
       finishedReplyChannel: finishedChannel
-    }) 
+    })
     this.ipcRenderer.removeAllListeners(progressChannel)
     this.ipcRenderer.removeAllListeners(finishedChannel)
     return result
@@ -70,7 +70,6 @@ export class FFMpegIpcRendererService extends IpcRendererService {
     return {
       close: async () => {
         const r = await this.ipcRenderer.invoke(params.closeChannel)
-        console.log('close result: ', r)
       }
     }
   }

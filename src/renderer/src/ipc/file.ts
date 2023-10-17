@@ -13,20 +13,14 @@ export class FileIpcRendererService extends IpcRendererService {
   selectFile(params?: OpenDialogOptions): string[] | undefined {
     return this.invoke('selectFile', {
       ...params,
-      properties : [
-        'openFile',
-        ...params?.properties || []
-      ]
+      properties: ['openFile', ...(params?.properties || [])]
     } as OpenDialogOptions)
   }
 
   selectFolder(params?: OpenDialogOptions) {
     return this.invoke('selectFile', {
       ...params,
-      properties : [
-        'openDirectory',
-        ...params?.properties || []
-      ]
+      properties: ['openDirectory', ...(params?.properties || [])]
     })
   }
 

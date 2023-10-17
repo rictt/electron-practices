@@ -1,5 +1,5 @@
 <template>
-  <svg :class="svgClass" aria-hidden="true">
+  <svg :class="svgClass" :style="{ fontSize: iconSize }" aria-hidden="true">
     <use :xlink:href="iconClassName" :fill="color" />
   </svg>
 </template>
@@ -18,6 +18,10 @@ const props = defineProps({
   color: {
     type: String,
     default: '#409eff'
+  },
+  size: {
+    type: [Number, String],
+    default: 0
   }
 })
 // 图标在 iconfont 中的名字
@@ -30,6 +34,13 @@ const svgClass = computed(() => {
     return `svg-icon ${props.className}`
   }
   return 'svg-icon'
+})
+
+const iconSize = computed(() => {
+  if (props.size) {
+    return props.size + 'px'
+  }
+  return ''
 })
 </script>
 

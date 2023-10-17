@@ -4,7 +4,7 @@ import Location from './location.vue'
 import { fileIpcRendererService } from '@renderer/ipc/file'
 import { ElMessage } from 'element-plus'
 
-/** 
+/**
  * 地址操作栏的逻辑
  *  栈 + 索引进行数据管理
  *    初始化，进入一个页面（此时前进后退都用不了），索引 = 0
@@ -12,7 +12,7 @@ import { ElMessage } from 'element-plus'
  *    再进入一个文件夹（索引=2，由于2》0，可以后退，不可以前进）
  *    操作一次后退，（索引=1，由于1》0， 1《2，可以后退，也可以前进）
  *    前进（索引=2，不可以前进，可以后退）
- * 
+ *
  * 索引永远指向当前的地址！！
  */
 
@@ -22,7 +22,7 @@ const state = reactive({
   loading: false,
   selectFileIndex: -1,
   pathStack: [],
-  pathStackIndex: -1,
+  pathStackIndex: -1
 })
 
 const canForward = computed(() => {
@@ -95,41 +95,48 @@ const onBackward = async () => {
 }
 
 onMounted(async () => {
+  console.log(fileIpcRendererService)
   state.currentDirPath = await fileIpcRendererService.getUserHome()
   pathStackPush(state.currentDirPath)
   await refreshDirs(state.currentDirPath)
 })
-
 </script>
 
 <template>
   <div>
-    <Location @reload="onReload" :location="state.currentDirPath" :canBackward="canBackward" :canForward="canForward" @forward="onForward" @backward="onBackward" />
+    <Location
+      :location="state.currentDirPath"
+      :can-backward="canBackward"
+      :can-forward="canForward"
+      @reload="onReload"
+      @forward="onForward"
+      @backward="onBackward"
+    />
     <!-- <div>
       <div>stack length:  {{ state.pathStack }}</div>
       <div>index: {{ state.pathStackIndex }}</div>
       <div>cur path: {{  state.currentDirPath }}</div>
     </div> -->
     <div v-loading="state.loading" class="file-list-wrap">
-      <div class="file-list" v-if="state.dirs.length">
+      <div v-if="state.dirs.length" class="file-list">
         <div
-          class="file-item"
-          @click="state.selectFileIndex = index"
-          @dblclick="onDbClick(file)"
-          :class="{ active: index === state.selectFileIndex }"
           v-for="(file, index) in state.dirs"
           :key="index"
+          class="file-item"
+          :class="{ active: index === state.selectFileIndex }"
+          @click="state.selectFileIndex = index"
+          @dblclick="onDbClick(file)"
         >
           <SvgIcon
             class="file-icon"
-            :iconName="file.isDirectory ? 'icon-folder-open' : 'icon-file-text2'"
+            :icon-name="file.isDirectory ? 'icon-folder-open' : 'icon-file-text2'"
           />
           <div class="file-name">{{ file.fileName }}</div>
           <div class="file-info">{{ new Date().toLocaleString() }}</div>
         </div>
       </div>
-      <div class="empty-tips" v-else>
-        <SvgIcon class="icon" iconName="icon-smile" />
+      <div v-else class="empty-tips">
+        <SvgIcon class="icon" icon-name="icon-smile" />
         <div class="icon-text">似乎进入了知识荒漠~</div>
       </div>
     </div>

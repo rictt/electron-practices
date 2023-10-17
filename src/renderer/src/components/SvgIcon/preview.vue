@@ -7,13 +7,8 @@ const iconIds = ref(ids)
 
 <template>
   <div style="font-size: 30px">
-    <el-tooltip
-      v-for="icon in iconIds"
-      :content="icon"
-      placement="top"
-      :key="icon"
-    >
-      <SvgIcon style="margin-right: 10px" :iconName="icon" />
+    <el-tooltip v-for="icon in iconIds" :key="icon" :content="icon" placement="top">
+      <SvgIcon style="margin-right: 10px" :icon-name="icon" />
     </el-tooltip>
   </div>
 </template>

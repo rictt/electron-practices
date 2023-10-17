@@ -1,7 +1,13 @@
 import { IpcMainBaseController } from './base'
 import type { IpcMainEvent } from 'electron'
 import { BrowserWindow, screen } from 'electron'
-import { createCaptureWindow, captureWindow } from '../../index'
+import { captureWindow } from '../../captureWindow'
+
+export const setCaptureWindowMax = async () => {
+  const primaryDisplay = screen.getPrimaryDisplay()
+  const { width, height } = primaryDisplay.workAreaSize
+  captureWindow?.setSize(width, height)
+}
 
 export class SystemController extends IpcMainBaseController {
   constructor() {
@@ -24,6 +30,10 @@ export class SystemController extends IpcMainBaseController {
 
   async showCapture(event: IpcMainEvent) {
     this.windowMinimize(event)
+    if (process.platform === 'darwin') {
+      const screen = await this.getScreenSize()
+      captureWindow?.setSize(screen.width, screen.height)
+    }
     captureWindow?.show()
   }
 
@@ -66,7 +76,6 @@ export class SystemController extends IpcMainBaseController {
     y?: number
   ) {
     const window = BrowserWindow.fromWebContents(event.sender)
-    console.log(width, height, full, x, y)
     if (typeof x === 'number' && typeof y === 'number') {
       window?.setPosition(x, y)
     }
@@ -74,7 +83,7 @@ export class SystemController extends IpcMainBaseController {
       if (full) {
         window.maximize()
         window.setFullScreen(true)
-        window.setAlwaysOnTop(true, "screen-saver")
+        window.setAlwaysOnTop(true, 'screen-saver')
       } else {
         window.setSize(width, height)
       }

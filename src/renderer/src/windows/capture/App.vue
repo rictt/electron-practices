@@ -3,15 +3,22 @@ import { reactive, computed, onMounted, onUnmounted } from 'vue'
 import { systemIpcRendererService } from '@renderer/ipc/system'
 import { ffmpegIpcRendererService } from '@renderer/ipc/ffmpeg'
 import { useMovePosition, mouseEventWrap } from './useMovePosition'
+import { ElMessage } from 'element-plus'
 
 const state = reactive({
-  mode: 'picture',
+  mode: 'video',
   visible: true,
   recordInstance: {}
 })
 
 const onClickStart = async () => {
-  // alert(`${data.width}, ${data.height}, ${data.left}, ${data.top}`)
+  console.log(
+    `采集尺寸信息：x: ${data.left}, y: ${data.top}, width: ${data.width}, height: ${data.height}`
+  )
+  if (process.platform !== 'win32') {
+    ElMessage.info('暂时只支持windows平台')
+    return
+  }
   state.visible = false
   setTimeout(async () => {
     const recordInstance = await ffmpegIpcRendererService.screenRecord({
@@ -21,8 +28,8 @@ const onClickStart = async () => {
       height: data.height
     })
     state.recordInstance = recordInstance
-    const width = document.querySelector('.recording-box')!.clientWidth
-    const height = document.querySelector('.recording-box')!.clientHeight
+    const width = document.querySelector('.recording-box').clientWidth
+    const height = document.querySelector('.recording-box').clientHeight
     systemIpcRendererService.setMini(Math.ceil(width), Math.ceil(height))
   }, 16)
 }
@@ -30,9 +37,9 @@ const onClickStart = async () => {
 const onClickCancel = async () => {
   resetData()
   state.visible = true
-  state.recordInstance?.close?.()
+  state.recordInstance?.close()
   const size = await systemIpcRendererService.getScreenSize()
-  console.log("size: ", size)
+  console.log('size: ', size)
   await systemIpcRendererService.setSize(size.width, size.height, true, 0, 0)
   await systemIpcRendererService.hideWindow()
 }
@@ -51,7 +58,7 @@ document.addEventListener('visibilitychange', () => {
 })
 
 const { state: data, reset: resetData } = useMovePosition({
-  ele: document.querySelector('body')!,
+  ele: document.querySelector('body'),
   log: false
 })
 
@@ -69,7 +76,7 @@ const menuStyle = computed(() => {
   return {
     display: data.width || data.height ? 'block' : 'none',
     left: data.left + 'px',
-    top: data.top + data.height + 20 + 'px',
+    top: data.top + data.height + 20 + 'px'
   }
 })
 
@@ -83,7 +90,7 @@ const mouseState = reactive({
 
 const createDragEvent = () => {
   const eventWrap = mouseEventWrap({
-    ele: document.querySelector('#capture-box')!,
+    ele: document.querySelector('#capture-box'),
     onMouseDown: (event) => {
       console.log('mouse down')
       const direction = (event.target as HTMLElement).getAttribute('data-direction')
@@ -122,17 +129,27 @@ const createDragEvent = () => {
       }
       const w = pos.diffX * horizontalFlag
       const h = pos.diffY * verticalFlag
+      const newWidth = mouseState.sw + w
+      const newHeight = mouseState.sh + h
+
       if (!['top', 'bottom'].includes(mouseState.direction)) {
-        data.width = mouseState.sw + w
+        data.width = Math.abs(newWidth)
       }
       if (!['left', 'right'].includes(mouseState.direction)) {
-        data.height = mouseState.sh + h
+        data.height = Math.abs(newHeight)
       }
       if (['left', 'leftTop', 'leftBottom'].includes(mouseState.direction)) {
         data.left = mouseState.oLeft - w
       }
       if (['leftTop', 'rightTop', 'top'].includes(mouseState.direction)) {
         data.top = mouseState.oTop - h
+      }
+
+      if (newWidth < 0) {
+        data.left = pos.mx
+      }
+      if (newHeight < 0) {
+        data.top = pos.my
       }
     }
   })
@@ -142,7 +159,7 @@ const createDragEvent = () => {
 
 const createMoveEvent = () => {
   const event = mouseEventWrap({
-    ele: document.querySelector('#pointer-box')!,
+    ele: document.querySelector('#pointer-box'),
     isStop: true,
     onMouseDown(event, pos) {
       mouseState.oLeft = data.left
@@ -172,10 +189,10 @@ onMounted(() => {
   <div v-show="state.visible">
     <div class="capture-menu" :style="menuStyle" @mousedown.stop>
       <div class="options">
-        <el-radio-group class="ops-mode" v-model="state.mode">
+        <el-radio-group v-model="state.mode" class="ops-mode">
+          <el-radio-button label="video">录制视频</el-radio-button>
           <el-radio-button label="picture">截图</el-radio-button>
           <el-radio-button label="gif">录制GIF</el-radio-button>
-          <el-radio-button label="vido">录制视频</el-radio-button>
         </el-radio-group>
         <div class="icon-item" title="退出" @click="onClickCancel">
           <SvgIcon icon-name="icon-cross" />
@@ -185,8 +202,8 @@ onMounted(() => {
         </div>
       </div>
     </div>
-  
-    <div id="capture-box" class="capture-box" @mousedown.stop.prevent="" :style="boxStyle">
+
+    <div id="capture-box" class="capture-box" :style="boxStyle" @mousedown.stop.prevent="">
       <div class="point p1" data-direction="leftTop"></div>
       <div class="point p2" data-direction="rightTop"></div>
       <div class="point p3" data-direction="leftBottom"></div>
@@ -195,7 +212,7 @@ onMounted(() => {
       <div class="point p6" data-direction="left"></div>
       <div class="point p7" data-direction="right"></div>
       <div class="point p8" data-direction="bottom"></div>
-  
+
       <div id="pointer-box" class="cursor-move-box"></div>
     </div>
   </div>

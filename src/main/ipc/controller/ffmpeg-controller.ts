@@ -14,7 +14,6 @@ export const generateFileName = () => {
   // return 'F:\\test.mp4'
   const baseDir = getUsersHomeFolder()
   const filePath = path.join(baseDir, 'test_' + Date.now() + '.mp4')
-  console.log(filePath)
   return filePath
 }
 
@@ -77,7 +76,6 @@ export class FFMpegController extends IpcMainBaseController {
     return sources || []
   }
 
-
   /**
    * https://zhuanlan.zhihu.com/p/580624916
    * https://blog.csdn.net/longji/article/details/124187706
@@ -87,19 +85,17 @@ export class FFMpegController extends IpcMainBaseController {
     console.log('start screen record params： ', params)
     const { x, y, width, height } = params
     const inputOptions: any[] = []
-    
+
     // inputOptions.push('-f dshow')
     inputOptions.push('-f gdigrab')
     if (width && height) {
-      inputOptions.push(
-        `-s ${Math.floor(width / 2) * 2}x${Math.floor(height / 2) * 2}`
-      )
+      inputOptions.push(`-s ${Math.floor(width / 2) * 2}x${Math.floor(height / 2) * 2}`)
     }
     if (x && y) {
       inputOptions.push(`-offset_x ${x}`)
       inputOptions.push(`-offset_y ${y}`)
     }
-    console.log("inputOptions: ", inputOptions)
+    console.log('inputOptions: ', inputOptions)
     const cmd = new ffmpeg()
     cmd
       // .input('video=screen-capture-recorder')

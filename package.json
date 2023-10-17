@@ -42,7 +42,7 @@
     "@vue/eslint-config-typescript": "^11.0.3",
     "autoprefixer": "^10.4.16",
     "axios": "^1.5.1",
-    "electron": "^25.6.0",
+    "electron": "^25.9.1",
     "electron-builder": "^24.6.3",
     "electron-vite": "^1.0.27",
     "element-plus": "^2.3.14",

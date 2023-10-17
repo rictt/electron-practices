@@ -1,10 +1,11 @@
-import { app, shell, BrowserWindow, globalShortcut, protocol } from 'electron'
+import { app, shell, BrowserWindow, globalShortcut, protocol, net } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { registerMainHanlders } from './ipc/index'
+import { NetworkUtil } from './utils/network'
 
-let mainWindow: BrowserWindow;
+let mainWindow: BrowserWindow
 
 function createWindow(): void {
   mainWindow = new BrowserWindow({
@@ -15,12 +16,23 @@ function createWindow(): void {
     // ...(process.platform === 'linux' ? { icon } : {}),
     icon,
     webPreferences: {
+      webviewTag: true,
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+      sandbox: false,
+      contextIsolation: false
+    }
+  })
+  const network = new NetworkUtil({
+    browser: mainWindow
+  })
+  network.addIntercept({
+    condition: (url) => url.indexOf('.m3u8') !== -1,
+    callback: (response) => {
+      console.log('response: ', response)
     }
   })
 
-  mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools()
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
@@ -31,8 +43,7 @@ function createWindow(): void {
     return { action: 'deny' }
   })
 
-  mainWindow.loadURL("https://www.med66.com/demo/linchuang/c724034-v1/")
-  
+  mainWindow.loadURL('https://www.med66.com/demo/linchuang/c724034-v1/')
   // if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
   //   mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   // } else {
@@ -40,7 +51,7 @@ function createWindow(): void {
   // }
 }
 
-export let captureWindow: BrowserWindow | null;
+export let captureWindow: BrowserWindow | null
 export function createCaptureWindow() {
   captureWindow = new BrowserWindow({
     transparent: true,
@@ -55,7 +66,7 @@ export function createCaptureWindow() {
   })
 
   globalShortcut.register('f12', () => {
-    captureWindow?.webContents?.openDevTools();
+    captureWindow?.webContents?.openDevTools()
   })
 
   captureWindow.on('show', () => {
@@ -77,11 +88,11 @@ export function createCaptureWindow() {
     captureWindow.loadFile(join(__dirname, '../renderer/capture.html'))
   }
 
-  captureWindow.once('ready-to-show', () => {
-  });
+  captureWindow.once('ready-to-show', () => {})
 
   captureWindow.on('close', () => {
     // captureWindow = null;
+    globalShortcut.unregister('f12')
   })
 }
 
@@ -99,7 +110,7 @@ protocol.registerSchemesAsPrivileged([
 
 app.whenReady().then(() => {
   electronApp.setAppUserModelId('com.electron')
-  
+
   protocol.handle('atom', (request: any) => {
     console.log('request: ', request.url)
     console.log('handle: ', decodeURIComponent(request.url.slice('atom://'.length)))
@@ -109,14 +120,16 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-
   createWindow()
 
-  setTimeout(() => {
-    createCaptureWindow();
-  }, 1000)
+  // 暂时只兼容windows平台
+  if (process.platform === 'win32') {
+    setTimeout(() => {
+      createCaptureWindow()
+    }, 1000)
+  }
 
-  registerMainHanlders(mainWindow);
+  registerMainHanlders(mainWindow)
 
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()

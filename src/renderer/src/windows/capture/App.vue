@@ -8,13 +8,19 @@ import { ElMessage } from 'element-plus'
 const state = reactive({
   mode: 'video',
   visible: true,
-  recordInstance: {}
+  recordInstance: {} as RecordInstance
 })
 
-const onClickStart = async () => {
-  console.log(
-    `采集尺寸信息：x: ${data.left}, y: ${data.top}, width: ${data.width}, height: ${data.height}`
-  )
+const screenShot = () => {
+  systemIpcRendererService.screenShot({
+    x: data.left,
+    y: data.top,
+    width: data.width,
+    height: data.height
+  })
+}
+
+const screenRecord = () => {
   if (process.platform !== 'win32') {
     ElMessage.info('暂时只支持windows平台')
     return
@@ -34,13 +40,30 @@ const onClickStart = async () => {
   }, 16)
 }
 
+const onClickStart = async () => {
+  console.log(
+    `采集尺寸信息：x: ${data.left}, y: ${data.top}, width: ${data.width}, height: ${data.height}`
+  )
+  switch (state.mode) {
+    case 'picture':
+      screenShot()
+      break
+    case 'video':
+      screenRecord()
+      break
+    case 'gif':
+      ElMessage.info('开发中')
+      break
+  }
+}
+
 const onClickCancel = async () => {
   resetData()
   state.visible = true
-  state.recordInstance?.close()
-  const size = await systemIpcRendererService.getScreenSize()
-  console.log('size: ', size)
-  await systemIpcRendererService.setSize(size.width, size.height, true, 0, 0)
+  // state.recordInstance?.close()
+  // const size = await systemIpcRendererService.getScreenSize()
+  // console.log('size: ', size)
+  // await systemIpcRendererService.setSize(size.width, size.height, true, 0, 0)
   await systemIpcRendererService.hideWindow()
 }
 

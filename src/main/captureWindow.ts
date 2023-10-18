@@ -19,7 +19,8 @@ export function createCaptureWindow() {
     frame: false,
     alwaysOnTop: true,
     show: false,
-    fullscreen: true,
+    // fullscreen: true,
+    fullscreen: process.platform === 'win32',
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false

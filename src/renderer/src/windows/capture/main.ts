@@ -1,7 +1,8 @@
-import { bootstrap } from "@renderer/bootstrap";
+import { bootstrap } from '@renderer/bootstrap'
 import App from './App.vue'
+import './index.css'
 
 bootstrap({
-  useElement: true,
+  useElementUI: true,
   container: App
 })

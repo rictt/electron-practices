@@ -1,8 +1,8 @@
 {
   "extends": "@electron-toolkit/tsconfig/tsconfig.node.json",
   "include": [
-    "electron.vite.config.*", 
-    "src/main/*", 
+    "electron.vite.config.*",
+    "src/main/*",
     "src/preload/*",
     "src/main/ipc/**/*",
     "src/main/ipc/*",
@@ -10,6 +10,6 @@
   "compilerOptions": {
     "noUnusedParameters": false,
     "noUnusedLocals": false,
-    "types": ["electron-vite/node"]
+    "types": ["electron-vite/node", "./src/types/index"],
   }
 }

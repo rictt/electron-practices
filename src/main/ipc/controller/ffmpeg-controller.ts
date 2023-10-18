@@ -80,7 +80,7 @@ export class FFMpegController extends IpcMainBaseController {
    * https://zhuanlan.zhihu.com/p/580624916
    * https://blog.csdn.net/longji/article/details/124187706
    */
-  async screenRecord(event: IpcMainEvent, params: any) {
+  async screenRecord(event: IpcMainEvent, params: Size) {
     // 需要提供结束方法
     console.log('start screen record params： ', params)
     const { x, y, width, height } = params

@@ -28,6 +28,21 @@ const modules: moduleItem[] = [
     component: undefined,
     route: '',
     icon: 'icon-smile'
+  },
+  {
+    name: 'FFmpeg',
+    desc: 'mp4、flv、ts文件处理',
+    icon: 'icon-smile'
+  },
+  {
+    name: '打印',
+    desc: '',
+    icon: 'icon-smile'
+  },
+  {
+    name: '资源管理器',
+    desc: '',
+    icon: 'icon-smile'
   }
 ]
 

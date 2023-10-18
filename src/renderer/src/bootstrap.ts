@@ -8,19 +8,19 @@ import 'virtual:svg-icons-register'
 import type { Router } from 'vue-router'
 
 type BootstrapParams = {
-  useElement: Boolean
+  useElementUI?: Boolean
   container: Component
   router?: Router
 }
 
 export function bootstrap(params: BootstrapParams) {
-  const { router, useElement = false, container } = params
-  
+  const { router, useElementUI = false, container } = params
+
   const app = createApp(container)
   app.component('SvgIcon', SvgIcon)
   app.component('SelectV2', SelectV2)
 
-  if (useElement) {
+  if (useElementUI) {
     app.use(ElementPlus, {
       size: 'small'
     })

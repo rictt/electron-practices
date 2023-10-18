@@ -1,5 +1,6 @@
-import { ElMessage } from 'element-plus'
 import { IpcRendererService } from './index'
+import { mediaSourceToDataURL } from '@/utils/canvas'
+
 export class SystemIpcRendererService extends IpcRendererService {
   constructor() {
     super('system')
@@ -31,6 +32,31 @@ export class SystemIpcRendererService extends IpcRendererService {
 
   async getScreenSize() {
     return this.invoke('getScreenSize')
+  }
+
+  async screenShot(params: Size) {
+    const { width, height, x, y } = params
+    const screen = await this.getScreenSize()
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: false,
+      video: {
+        mandatory: {
+          chromeMediaSource: 'desktop',
+          width: screen.width,
+          height: screen.height
+        }
+      }
+    })
+    const video = document.createElement('video')
+
+    video.srcObject = stream
+    video.style.width = screen.width + 'px'
+    video.style.height = screen.height + 'px'
+    video.onloadeddata = () => {
+      video.play()
+      mediaSourceToDataURL({ source: video, width, height, x, y, downloadName: 'screenshot.png' })
+      stream.getTracks()[0].stop()
+    }
   }
 }
 

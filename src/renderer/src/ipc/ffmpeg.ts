@@ -1,5 +1,5 @@
 import { IpcRendererService } from './index'
-import type { IpcRendererEvent, OpenDialogOptions } from 'electron'
+import type { IpcRendererEvent } from 'electron'
 
 type TypeFormatParams = {
   storageDir: string
@@ -15,10 +15,6 @@ type TypeScreenRecord = {
   input?: string
   outputPath?: string
   closeChannel?: string
-}
-
-type RecordInstance = {
-  close: Function
 }
 
 export class FFMpegIpcRendererService extends IpcRendererService {
@@ -69,7 +65,7 @@ export class FFMpegIpcRendererService extends IpcRendererService {
     await this.invoke('screenRecord', params)
     return {
       close: async () => {
-        const r = await this.ipcRenderer.invoke(params.closeChannel)
+        await this.ipcRenderer.invoke(params.closeChannel)
       }
     }
   }

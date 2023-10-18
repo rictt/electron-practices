@@ -29,14 +29,13 @@ export class SystemController extends IpcMainBaseController {
   }
 
   async showCapture(event: IpcMainEvent) {
-    this.windowMinimize(event)
-    if (process.platform === 'darwin') {
-      const screen = await this.getScreenSize()
-      captureWindow?.setSize(screen.width, screen.height)
-    }
+    // this.windowMinimize(event)
+    captureWindow?.setFullScreen(true)
     captureWindow?.show()
+    captureWindow?.setAlwaysOnTop(true)
   }
 
+  // 最小化当前窗口（发送请求的窗口）
   async windowMinimize(event: IpcMainEvent) {
     const window = BrowserWindow.fromWebContents(event.sender)
     if (window) {

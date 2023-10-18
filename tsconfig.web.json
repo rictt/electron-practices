@@ -13,6 +13,7 @@
     "strict": false,
     "noUnusedParameters": false,
     "noUnusedLocals": false,
+    "types": ["./src/types/index"],
     "paths": {
       "@renderer/*": [
         "./src/renderer/src/*"

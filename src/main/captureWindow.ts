@@ -5,6 +5,9 @@ import { setCaptureWindowMax } from './ipc/controller/system'
 export let captureWindow: BrowserWindow | null
 
 export function createCaptureWindow() {
+  if (captureWindow) {
+    return
+  }
   const isMac = process.platform === 'darwin'
   const macOptions = isMac
     ? {

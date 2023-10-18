@@ -10,7 +10,7 @@
 - Electron
 - FFmpeg
 
-## 支持功能
+## 功能实现
 - 本地文件预览（mp4、webm、flv等）
 - m3u8、ts处理
 - 支持常见视频格式的转换（flv、mp4）

@@ -26,8 +26,8 @@ export class SystemIpcRendererService extends IpcRendererService {
     return await this.invoke('setMini', width, height, direction)
   }
 
-  async showCapture() {
-    return this.invoke('showCapture')
+  async showCapture(mode?: string) {
+    return this.invoke('showCapture', mode)
   }
 
   async getScreenSize() {
@@ -35,7 +35,7 @@ export class SystemIpcRendererService extends IpcRendererService {
   }
 
   async screenShot(params: Size) {
-    const { width, height, x, y } = params
+    await this.hideWindow()
     const screen = await this.getScreenSize()
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: false,
@@ -47,16 +47,21 @@ export class SystemIpcRendererService extends IpcRendererService {
         }
       }
     })
-    const video = document.createElement('video')
 
-    video.srcObject = stream
-    video.style.width = screen.width + 'px'
-    video.style.height = screen.height + 'px'
-    video.onloadeddata = () => {
-      video.play()
-      mediaSourceToDataURL({ source: video, width, height, x, y, downloadName: 'screenshot.png' })
-      stream.getTracks()[0].stop()
-    }
+    return new Promise((resolve) => {
+      const { width, height, x, y } = params
+      const video = document.createElement('video')
+
+      video.srcObject = stream
+      video.style.width = screen.width + 'px'
+      video.style.height = screen.height + 'px'
+      video.onloadeddata = () => {
+        video.play()
+        const url = mediaSourceToDataURL({ source: video, width, height, x, y })
+        stream.getTracks()[0].stop()
+        resolve(url)
+      }
+    })
   }
 }
 

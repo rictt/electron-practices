@@ -1,7 +1,7 @@
 import { IpcMainBaseController } from './base'
 import type { IpcMainEvent } from 'electron'
 import { BrowserWindow, screen } from 'electron'
-import { captureWindow } from '../../captureWindow'
+import { captureWindow, createCaptureWindow } from '../../captureWindow'
 
 export const setCaptureWindowMax = async () => {
   const primaryDisplay = screen.getPrimaryDisplay()
@@ -29,10 +29,11 @@ export class SystemController extends IpcMainBaseController {
   }
 
   async showCapture(event: IpcMainEvent) {
-    // this.windowMinimize(event)
-    captureWindow?.setFullScreen(true)
-    captureWindow?.show()
-    captureWindow?.setAlwaysOnTop(true)
+    await setCaptureWindowMax()
+    await captureWindow?.setFullScreen(true)
+    await captureWindow?.show()
+    await captureWindow?.setAlwaysOnTop(true)
+    await captureWindow?.focus()
   }
 
   // 最小化当前窗口（发送请求的窗口）

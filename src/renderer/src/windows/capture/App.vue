@@ -4,20 +4,27 @@ import { systemIpcRendererService } from '@renderer/ipc/system'
 import { ffmpegIpcRendererService } from '@renderer/ipc/ffmpeg'
 import { useMovePosition, mouseEventWrap } from './useMovePosition'
 import { ElMessage } from 'element-plus'
+import { dataIpcRendererService } from '@renderer/ipc/data'
+
+dataIpcRendererService.listener('capture.mode', (value) => {
+  state.mode = value
+})
 
 const state = reactive({
-  mode: 'video',
+  mode: 'screenrecord',
   visible: true,
   recordInstance: {} as RecordInstance
 })
 
-const screenShot = () => {
-  systemIpcRendererService.screenShot({
+const screenShot = async () => {
+  const url = await systemIpcRendererService.screenShot({
     x: data.left,
     y: data.top,
     width: data.width,
     height: data.height
   })
+  await dataIpcRendererService.set('capture.screenshotUrl', url)
+  await systemIpcRendererService.hideWindow()
 }
 
 const screenRecord = () => {
@@ -45,10 +52,10 @@ const onClickStart = async () => {
     `采集尺寸信息：x: ${data.left}, y: ${data.top}, width: ${data.width}, height: ${data.height}`
   )
   switch (state.mode) {
-    case 'picture':
+    case 'screenshot':
       screenShot()
       break
-    case 'video':
+    case 'screenrecord':
       screenRecord()
       break
     case 'gif':
@@ -58,13 +65,9 @@ const onClickStart = async () => {
 }
 
 const onClickCancel = async () => {
+  await systemIpcRendererService.hideWindow()
   resetData()
   state.visible = true
-  // state.recordInstance?.close()
-  // const size = await systemIpcRendererService.getScreenSize()
-  // console.log('size: ', size)
-  // await systemIpcRendererService.setSize(size.width, size.height, true, 0, 0)
-  await systemIpcRendererService.hideWindow()
 }
 
 const onFinishRecord = async () => {
@@ -213,8 +216,8 @@ onMounted(() => {
     <div class="capture-menu" :style="menuStyle" @mousedown.stop>
       <div class="options">
         <el-radio-group v-model="state.mode" class="ops-mode">
-          <el-radio-button label="video">录制视频</el-radio-button>
-          <el-radio-button label="picture">截图</el-radio-button>
+          <el-radio-button label="screenrecord">录制视频</el-radio-button>
+          <el-radio-button label="screenshot">截图</el-radio-button>
           <el-radio-button label="gif">录制GIF</el-radio-button>
         </el-radio-group>
         <div class="icon-item" title="退出" @click="onClickCancel">
@@ -252,6 +255,8 @@ onMounted(() => {
   top: 0;
   left: 0;
   border: 1px solid red;
+  // background-color: skyblue;
+  // background-color: transparent;
   border-radius: 2px;
   color: #fff;
   user-select: none;

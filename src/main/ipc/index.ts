@@ -5,6 +5,7 @@ import { FileController } from './controller/file-controller'
 import { FFMpegController } from './controller/ffmpeg-controller'
 import { StoreController } from './controller/store-controller'
 import { SystemController } from './controller/system'
+import { DataController } from './controller/data-controller'
 
 export const enumControllerMethods = <T extends IpcMainBaseController>(clsInstance: T) => {
   const result = {}
@@ -31,17 +32,20 @@ export const registerMainHanlders = (mainWindow: BrowserWindow) => {
   const ffmpeg = new FFMpegController()
   const store = new StoreController()
   const system = new SystemController()
+  const data = new DataController()
 
   enumControllerMethods(file)
   enumControllerMethods(ffmpeg)
   enumControllerMethods(store)
   enumControllerMethods(system)
+  enumControllerMethods(data)
 
   const controllers = {
     file,
     ffmpeg,
     store,
-    system
+    system,
+    data
   }
 
   return controllers

@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { VueElement } from 'vue'
+import { VueElement, reactive } from 'vue'
 import { ffmpegIpcRendererService } from '@/ipc/ffmpeg'
 import { systemIpcRendererService } from '@/ipc/system'
 import LayoutNav from './components/LayoutNav.vue'
+import { dataIpcRendererService } from './ipc/data'
 
 type moduleItem = {
   name: string
@@ -12,6 +13,11 @@ type moduleItem = {
   icon: string
   handler?: () => void
 }
+
+dataIpcRendererService.listener('capture.screenshotUrl', (url) => {
+  state.screenshot = url
+})
+
 const modules: moduleItem[] = [
   {
     name: '录屏',
@@ -20,6 +26,7 @@ const modules: moduleItem[] = [
     route: '',
     icon: 'icon-smile',
     handler: async () => {
+      await dataIpcRendererService.set('capture.mode', 'screenrecord')
       await systemIpcRendererService.showCapture()
     }
   },
@@ -27,7 +34,12 @@ const modules: moduleItem[] = [
     name: '截图',
     component: undefined,
     route: '',
-    icon: 'icon-smile'
+    desc: '存在问题：窗口残留阴影',
+    icon: 'icon-smile',
+    handler: async () => {
+      await dataIpcRendererService.set('capture.mode', 'screenshot')
+      await systemIpcRendererService.showCapture()
+    }
   },
   {
     name: 'FFmpeg',
@@ -43,14 +55,23 @@ const modules: moduleItem[] = [
     name: '资源管理器',
     desc: '',
     icon: 'icon-smile'
+  },
+  {
+    name: '网络请求拦截',
+    desc: '',
+    icon: 'icon-smile'
   }
 ]
+
+const state = reactive({
+  screenshot: ''
+})
 
 const onClickItem = async (item) => {
   console.log(item)
   const { component, route, handler } = item
   if (handler) {
-    await handler()
+    handler()
   }
 }
 </script>
@@ -63,7 +84,7 @@ const onClickItem = async (item) => {
       <div
         v-for="item in modules"
         :key="item.name"
-        class="w-[200px] h-[120px] border my-2 rounded shadow-sm cursor-pointer"
+        class="w-[200px] h-[120px] border my-2 rounded shadow-sm cursor-pointer select-none"
         @click="onClickItem(item)"
       >
         <div class="w-full h-full inline-flex flex-col items-center justify-between pt-4 pb-2">
@@ -73,6 +94,7 @@ const onClickItem = async (item) => {
         </div>
       </div>
     </div>
+    <img :src="state.screenshot" alt="" />
     <!-- <LayoutNav />
     <div style="padding: 10px 0">
       <router-view></router-view>

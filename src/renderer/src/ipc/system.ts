@@ -19,23 +19,44 @@ export class SystemIpcRendererService extends IpcRendererService {
   }
 
   async setSize(width, height, full?, x?, y?) {
-    return await this.invoke('setSize', width, height, full, x, y)
+    return await this.invoke('setSize', { width, height, full, x, y })
   }
 
   async setMini(width, height, direction?) {
-    return await this.invoke('setMini', width, height, direction)
+    return await this.invoke('setMini', { width, height, direction })
   }
 
   async showCapture(mode?: string) {
-    return this.invoke('showCapture', mode)
+    return this.invoke('showCapture', { mode })
   }
 
   async getScreenSize() {
     return this.invoke('getScreenSize')
   }
 
-  async screenShot(params: Size) {
-    await this.hideWindow()
+  /**
+   * 凭借electron提供的desktopCapture，将屏幕绘制下来，送到浏览器进行canvas区域裁剪
+   */
+  async screenShotByDeskCapture(params: Size) {
+    return new Promise((resolve) => {
+      return this.invoke('screenShot', params, {
+        once: true,
+        onSuccess: (event, baseUrl) => {
+          const image = new Image()
+          image.onload = () => {
+            const url = mediaSourceToDataURL({ source: image, ...params })
+            resolve(url)
+          }
+          image.src = baseUrl
+        }
+      })
+    })
+  }
+
+  /**
+   * 凭借chrome提供的媒体采集，直接在浏览器获取桌面的媒体信号，然后转换成canvas，裁剪成对应尺寸的图片
+   */
+  async screenShowByUserMedia(params: Size) {
     const screen = await this.getScreenSize()
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: false,
@@ -62,6 +83,12 @@ export class SystemIpcRendererService extends IpcRendererService {
         resolve(url)
       }
     })
+  }
+
+  async screenShot(params: Size) {
+    await this.hideWindow()
+    // return await this.screenShowByUserMedia(params)
+    return await this.screenShotByDeskCapture(params)
   }
 }
 

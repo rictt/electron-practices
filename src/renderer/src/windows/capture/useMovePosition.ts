@@ -18,7 +18,7 @@ type PositionSize = {
 type Params = {
   ele: HTMLElement
   // 默认是body，比如要处理起点在ele身上，同时要监听全局移动，就需要设置全局的那个节点，比如body
-  wrapper?: HTMLElement 
+  wrapper?: HTMLElement
   isStop?: boolean
   isPrevent?: boolean
   log?: boolean
@@ -30,7 +30,7 @@ type Params = {
 export function mouseEventWrap(params: Params) {
   let { ele, wrapper, isStop } = params
   wrapper = wrapper || document.querySelector('body')!
-  let _click = false;
+  let _click = false
 
   const pos: PositionSize = {
     sx: 0,
@@ -66,7 +66,7 @@ export function mouseEventWrap(params: Params) {
   }
 
   const mouseUp = (event: MouseEvent) => {
-    _click = false;
+    _click = false
     params.onMouseUp?.(event, pos)
     isStop && event.stopPropagation()
   }
@@ -74,13 +74,13 @@ export function mouseEventWrap(params: Params) {
   ele.addEventListener('mousedown', mouseDown)
   wrapper.addEventListener('mousemove', mouseMove)
   wrapper.addEventListener('mouseup', mouseUp)
-  
+
   const remove = () => {
     ele.removeEventListener('mousedown', mouseDown)
     wrapper!.removeEventListener('mousemove', mouseMove)
     wrapper!.removeEventListener('mouseup', mouseUp)
   }
-  
+
   return {
     remove
   }
@@ -105,7 +105,7 @@ export function useMovePosition(params: Params) {
     }
   }
   const state = reactive(createDefault())
-  
+
   const printLog = (msg: any) => {
     if (log) {
       console.log(msg)
@@ -149,7 +149,7 @@ export function useMovePosition(params: Params) {
     state,
     reset: () => {
       const newData = createDefault()
-      Object.keys(newData).forEach(key => {
+      Object.keys(newData).forEach((key) => {
         state[key] = newData[key]
       })
     }

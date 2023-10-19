@@ -50,11 +50,11 @@ export class FFMpegController extends IpcMainBaseController {
     super('ffmpeg')
   }
 
-  async flvToMp4(event: IpcMainEvent, args) {
-    const { storageDir, inputFilePath, outputFilePath, ...rest } = args
+  async flvToMp4(event: IpcMainEvent, params: InvokeParams) {
+    const { storageDir, inputFilePath, outputFilePath, ...rest } = params
     const data = await getMetadata(inputFilePath)
-    const processReplyChannel = args.processReplyChannel || ''
-    const finishedReplyChannel = args.finishedReplyChannel || ''
+    const processReplyChannel = params.processReplyChannel || ''
+    const finishedReplyChannel = params.finishedReplyChannel || ''
     // const outputFilePath = "C:\\Users\\liaozhicheng\\Desktop\\代办项\\test3.mp4"
     await flvToMp4(inputFilePath, outputFilePath, {
       onProgress: (progress) => {
@@ -67,7 +67,8 @@ export class FFMpegController extends IpcMainBaseController {
     return data
   }
 
-  async getMetadata(event: IpcMainEvent, filePath: string) {
+  async getMetadata(event: IpcMainEvent, params: InvokeParams) {
+    const { filePath } = params
     return await getMetadata(filePath)
   }
 
@@ -80,7 +81,7 @@ export class FFMpegController extends IpcMainBaseController {
    * https://zhuanlan.zhihu.com/p/580624916
    * https://blog.csdn.net/longji/article/details/124187706
    */
-  async screenRecord(event: IpcMainEvent, params: Size) {
+  async screenRecord(event: IpcMainEvent, params: Size & { closeChannel: string }) {
     // 需要提供结束方法
     console.log('start screen record params： ', params)
     const { x, y, width, height } = params

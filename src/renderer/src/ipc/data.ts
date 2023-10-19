@@ -7,11 +7,11 @@ export class DataIpcRendererService extends IpcRendererService {
   }
 
   get(key: string) {
-    return this.invoke('key', key)
+    return this.invoke('key', { key })
   }
 
   set(key: string, value) {
-    this.invoke('set', key, value)
+    this.invoke('set', { key, value })
   }
 
   listener(key: string, callback) {
@@ -21,7 +21,10 @@ export class DataIpcRendererService extends IpcRendererService {
       callback(args)
     })
 
-    this.invoke('listener', key, responseChannel)
+    this.invoke('listener', {
+      key,
+      responseChannel
+    })
     return {
       close: () => {}
     }

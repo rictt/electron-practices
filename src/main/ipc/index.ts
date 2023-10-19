@@ -23,7 +23,6 @@ export const enumControllerMethods = <T extends IpcMainBaseController>(clsInstan
     }
   })
 
-  console.log('register result: ', result)
   return result
 }
 

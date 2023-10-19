@@ -1,7 +1,7 @@
 import { IpcMainBaseController } from './base'
 import type { IpcMainEvent } from 'electron'
-import { BrowserWindow, screen } from 'electron'
-import { captureWindow, createCaptureWindow } from '../../captureWindow'
+import { BrowserWindow, screen, desktopCapturer, clipboard, nativeImage } from 'electron'
+import { captureWindow } from '../../captureWindow'
 
 export const setCaptureWindowMax = async () => {
   const primaryDisplay = screen.getPrimaryDisplay()
@@ -26,6 +26,42 @@ export class SystemController extends IpcMainBaseController {
   async showWindow(event: IpcMainEvent) {
     const window = BrowserWindow.fromWebContents(event.sender)
     window?.show()
+  }
+
+  async screenShot(event: IpcMainEvent, params: Size, options?: InvokeOptions) {
+    // exec('screencapture -i -U -c', (error, stdout, stderr) => {
+    //   console.log('308', error, stdout, stderr)
+    //   // 从剪切板上取到图片
+    //   const pngs = clipboard.readImage().toPNG()
+    //   const imgs = 'data:image/png;base64,' + pngs.toString('base64')
+    //   // mainWin是窗口实例，这里是将图片传给渲染进程
+    //   // mainWin.webContents.send('captureScreenBack', imgs)
+    //   console.log('success imgs: ', imgs)
+    // })
+    console.log('params: ', params, options)
+    const size = await this.getScreenSize()
+    desktopCapturer
+      .getSources({
+        types: ['screen'],
+        thumbnailSize: {
+          width: size.width,
+          height: size.height
+        }
+      })
+      .then((sources) => {
+        const imgSrc = sources[0].thumbnail.toDataURL()
+        clipboard.writeImage(nativeImage.createFromDataURL(imgSrc))
+        // console.log("imgSrc: ", imgSrc)
+        if (options?.onSuccessChannel) {
+          console.log('callback ', options.onSuccessChannel)
+          event.sender.send(options.onSuccessChannel, imgSrc)
+        }
+      })
+      .catch((error) => {
+        if (options?.onFailChannel) {
+          event.sender.send(options.onFailChannel, error)
+        }
+      })
   }
 
   async showCapture(event: IpcMainEvent) {
@@ -53,7 +89,9 @@ export class SystemController extends IpcMainBaseController {
     }
   }
 
-  async setMini(event: IpcMainEvent, width: number, height: number, direction?: string) {
+  async setMini(event: IpcMainEvent, params: InvokeParams) {
+    // eslint-disable-next-line prefer-const
+    let { width, height, direction } = params
     direction = direction || 'right-bottom'
     const window = BrowserWindow.fromWebContents(event.sender)
     if (window) {

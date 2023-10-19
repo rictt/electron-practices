@@ -21,10 +21,11 @@ export class DataController extends IpcMainBaseController {
     this.stateListeners = []
   }
 
-  listener(event: IpcMainEvent, key: string, responseKey: string) {
+  listener(event: IpcMainEvent, params: InvokeParams) {
+    const { key, responseChannel } = params
     this.stateListeners.push({
       key,
-      responseChannel: responseKey
+      responseChannel
     })
   }
 
@@ -32,11 +33,13 @@ export class DataController extends IpcMainBaseController {
     return state.capture.mode
   }
 
-  setMode(event: IpcMainEvent, value: string) {
+  setMode(event: IpcMainEvent, params: InvokeParams) {
+    const { value } = params
     state.capture.mode = value
   }
 
-  get(event: IpcMainEvent, key: string) {
+  get(event: IpcMainEvent, params: InvokeParams) {
+    const { key } = params
     if (key.indexOf('.') !== -1) {
       const keys = key.split('.')
       let value = state[keys[0]]
@@ -51,7 +54,8 @@ export class DataController extends IpcMainBaseController {
     return state[key]
   }
 
-  set(event: IpcMainEvent, key: string, newValue: any) {
+  set(event: IpcMainEvent, params: InvokeParams) {
+    const { key, value: newValue } = params
     if (key.indexOf('.') !== -1) {
       const keys = key.split('.')
       let value = state[keys[0]]

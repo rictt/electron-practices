@@ -70,9 +70,10 @@ export class FileController extends IpcMainBaseController {
     super('file')
   }
 
-  async open(event: IpcMainEvent, path: string, params?: any) {
+  async open(event: IpcMainEvent, params: InvokeParams) {
+    const { path, ...resetParams } = params
     const module = await import('open')
-    return module.default(path, params)
+    return module.default(path, resetParams)
     // return open(path, params)
   }
 

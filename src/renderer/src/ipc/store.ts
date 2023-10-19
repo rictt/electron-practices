@@ -8,11 +8,11 @@ export class StoreIpcRendererService extends IpcRendererService {
   }
 
   get(key: string) {
-    return this.invoke('get', key)
+    return this.invoke('get', { key })
   }
 
   set(key: string, value: any) {
-    return this.invoke('set', key, value)
+    return this.invoke('set', { key, value })
   }
 
   getConfig() {

@@ -18,11 +18,40 @@ export class IpcRendererService {
     return `${channel}_response_${Date.now()}`
   }
 
-  async invoke(channel: string, ...params: any[]): Promise<any> {
-    // async invoke(channel: string, params?: any) {
-    const fullChannel = `${this.prefix}:${channel}`
+  generateChannel(...channels: (string | number)[]) {
+    channels.push(Date.now())
+    return channels.join('_')
+  }
+
+  initCallbackChannel(channel: string, options?: InvokeOptions) {
+    if (!options) return
+    const { once } = options
+    const onFun = once ? this.ipcRenderer.once : this.ipcRenderer.on
+    if (options.onSuccess) {
+      options.onSuccessChannel = this.generateChannel(this.prefix, channel, 'success')
+      onFun(options.onSuccessChannel, options.onSuccess)
+    }
+    if (options.onFail) {
+      options.onFailChannel = this.generateChannel(this.prefix, channel, 'fail')
+      onFun(options.onFailChannel, options.onFail)
+    }
+  }
+
+  // async invoke(channel: string, ...params: any[]): Promise<any> {
+  async invoke(channel: string, params?: InvokeParams, options?: InvokeOptions): Promise<any> {
     try {
-      const result = await this.ipcRenderer.invoke(fullChannel, ...params)
+      const fullChannel = `${this.prefix}:${channel}`
+      this.initCallbackChannel(channel, options)
+      const result = await this.ipcRenderer.invoke(
+        fullChannel,
+        params || {},
+        options
+          ? {
+              onSuccessChannel: options?.onSuccessChannel,
+              onFailChannel: options?.onFailChannel
+            }
+          : null
+      )
       return result
     } catch (error) {
       console.error('[invoke error]: ', error)

@@ -9,11 +9,13 @@ export class StoreController extends IpcMainBaseController {
     super('store')
   }
 
-  get(event: IpcMainEvent, key: string) {
+  get(event: IpcMainEvent, params: InvokeParams) {
+    const { key } = params
     return store.get(key)
   }
 
-  set(event: IpcMainEvent, key: string, value: any) {
+  set(event: IpcMainEvent, params: InvokeParams) {
+    const { key, value } = params
     return store.set(key, value)
   }
 }

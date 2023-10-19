@@ -15,7 +15,7 @@ function createWindow(): void {
     autoHideMenuBar: true,
     icon,
     webPreferences: {
-      devTools: false,
+      devTools: true,
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
     }

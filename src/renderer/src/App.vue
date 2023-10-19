@@ -1,22 +1,18 @@
 <script setup lang="ts">
 import { VueElement, reactive } from 'vue'
-import { ffmpegIpcRendererService } from '@/ipc/ffmpeg'
+// import { ffmpegIpcRendererService } from '@/ipc/ffmpeg'
 import { systemIpcRendererService } from '@/ipc/system'
-import LayoutNav from './components/LayoutNav.vue'
 import { dataIpcRendererService } from './ipc/data'
+import ScreenShot from './components/ScreenShot.vue'
 
 type moduleItem = {
   name: string
   desc?: string
-  component?: VueElement | undefined
+  component?: typeof ScreenShot
   route?: string
   icon: string
   handler?: () => void
 }
-
-dataIpcRendererService.listener('capture.screenshotUrl', (url) => {
-  state.screenshot = url
-})
 
 const modules: moduleItem[] = [
   {
@@ -32,7 +28,7 @@ const modules: moduleItem[] = [
   },
   {
     name: '截图',
-    component: undefined,
+    component: ScreenShot,
     route: '',
     desc: '存在问题：窗口残留阴影',
     icon: 'icon-smile',
@@ -64,14 +60,17 @@ const modules: moduleItem[] = [
 ]
 
 const state = reactive({
-  screenshot: ''
+  component: null
 })
 
 const onClickItem = async (item) => {
-  console.log(item)
-  const { component, route, handler } = item
+  state.component = null
+  const { component, handler } = item
   if (handler) {
     handler()
+  }
+  if (component) {
+    state.component = component
   }
 }
 </script>
@@ -94,7 +93,7 @@ const onClickItem = async (item) => {
         </div>
       </div>
     </div>
-    <img :src="state.screenshot" alt="" />
+    <component :is="state.component" v-if="state.component" />
     <!-- <LayoutNav />
     <div style="padding: 10px 0">
       <router-view></router-view>

@@ -7,7 +7,7 @@ export class FileIpcRendererService extends IpcRendererService {
   }
 
   getDirs(p?: string) {
-    return this.invoke('getDirs', p)
+    return this.invoke('getDirs', { path: p })
   }
 
   selectFile(params?: OpenDialogOptions): string[] | undefined {
@@ -25,7 +25,7 @@ export class FileIpcRendererService extends IpcRendererService {
   }
 
   open(path: string, params?: any) {
-    return this.invoke('open', path, params)
+    return this.invoke('open', { path, params })
   }
 
   getUserHome() {

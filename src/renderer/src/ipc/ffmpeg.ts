@@ -52,7 +52,7 @@ export class FFMpegIpcRendererService extends IpcRendererService {
   }
 
   async getMetadata(filePath: string) {
-    return await this.invoke('getMetadata', filePath)
+    return await this.invoke('getMetadata', { filePath })
   }
 
   async getCapturerSources() {

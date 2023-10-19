@@ -1,6 +1,8 @@
-# 基于FFmpeg的音视频处理软件
+# 基于Electron的实践Demo
 
-项目基于[create-electron](https://521github.com/alex8088/quick-start/tree/master/packages/create-electron)快速开发
+项目基于[create-electron](https://521github.com/alex8088/quick-start/tree/master/packages/create-electron)快速开发，比如`录屏`、`截图`、`网络请求拦截`等
+
+![](./screenshot/1.png)
 
 
 ## 技术栈

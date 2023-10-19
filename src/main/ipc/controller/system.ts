@@ -29,39 +29,25 @@ export class SystemController extends IpcMainBaseController {
   }
 
   async screenShot(event: IpcMainEvent, params: Size, options?: InvokeOptions) {
-    // exec('screencapture -i -U -c', (error, stdout, stderr) => {
-    //   console.log('308', error, stdout, stderr)
-    //   // 从剪切板上取到图片
-    //   const pngs = clipboard.readImage().toPNG()
-    //   const imgs = 'data:image/png;base64,' + pngs.toString('base64')
-    //   // mainWin是窗口实例，这里是将图片传给渲染进程
-    //   // mainWin.webContents.send('captureScreenBack', imgs)
-    //   console.log('success imgs: ', imgs)
-    // })
-    console.log('params: ', params, options)
     const size = await this.getScreenSize()
-    desktopCapturer
-      .getSources({
-        types: ['screen'],
-        thumbnailSize: {
-          width: size.width,
-          height: size.height
-        }
-      })
-      .then((sources) => {
-        const imgSrc = sources[0].thumbnail.toDataURL()
-        clipboard.writeImage(nativeImage.createFromDataURL(imgSrc))
-        // console.log("imgSrc: ", imgSrc)
-        if (options?.onSuccessChannel) {
-          console.log('callback ', options.onSuccessChannel)
-          event.sender.send(options.onSuccessChannel, imgSrc)
-        }
-      })
-      .catch((error) => {
-        if (options?.onFailChannel) {
-          event.sender.send(options.onFailChannel, error)
-        }
-      })
+    return new Promise((resolve, reject) => {
+      desktopCapturer
+        .getSources({
+          types: ['screen'],
+          thumbnailSize: {
+            width: size.width,
+            height: size.height
+          }
+        })
+        .then((sources) => {
+          const imgSrc = sources[0].thumbnail.toDataURL()
+          clipboard.writeImage(nativeImage.createFromDataURL(imgSrc))
+          resolve(imgSrc)
+        })
+        .catch((error) => {
+          reject(error)
+        })
+    })
   }
 
   async showCapture(event: IpcMainEvent) {

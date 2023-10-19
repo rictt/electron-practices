@@ -39,16 +39,13 @@ export class SystemIpcRendererService extends IpcRendererService {
    */
   async screenShotByDeskCapture(params: Size) {
     return new Promise((resolve) => {
-      return this.invoke('screenShot', params, {
-        once: true,
-        onSuccess: (event, baseUrl) => {
-          const image = new Image()
-          image.onload = () => {
-            const url = mediaSourceToDataURL({ source: image, ...params })
-            resolve(url)
-          }
-          image.src = baseUrl
+      this.invoke('screenShot', params).then((base64Url) => {
+        const image = new Image()
+        image.onload = () => {
+          const url = mediaSourceToDataURL({ source: image, ...params })
+          resolve(url)
         }
+        image.src = base64Url
       })
     })
   }
